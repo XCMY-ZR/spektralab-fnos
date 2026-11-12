@@ -95,7 +95,7 @@ Then assemble and pack:
 
 ```bash
 cd ..                    # beside the SpektraLab checkout
-git clone https://github.com/JamesQiu2005/spektralab-fnos.git
+git clone https://github.com/XCMY-ZR/spektralab-fnos.git
 cd spektralab-fnos
 SRC=../SpektraLab ./build.sh
 ```

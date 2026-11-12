@@ -150,7 +150,7 @@ SpektraLab 不是滤镜，也不是 LUT。
 | 文件 | `spektralab.fpk` |
 | 大小 | 17,011,583 字节 |
 | SHA-256 | `17f27d7976d894e932e7f61ef33d6571c7ad4945b562d42e9454e8c9bebf4367` |
-| 项目地址 | https://github.com/JamesQiu2005/spektralab-fnos |
+| 项目地址 | https://github.com/XCMY-ZR/spektralab-fnos |
 
 ---
 
