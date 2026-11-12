@@ -63,6 +63,11 @@ if ! command -v fnpack >/dev/null 2>&1; then
   exit 1
 fi
 
+# The two generated trees are gitignored, so a fresh clone has neither: `install`
+# into a missing directory fails with "No such file or directory" rather than
+# creating it.
+mkdir -p "$APP/host" "$APP/server"
+
 # 1. The engine binary. `install` sets 755: the compiler leaves it mode 000.
 install -m 755 "$HOST" "$APP/host/spektralab-host"
 

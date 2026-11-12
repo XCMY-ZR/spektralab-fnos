@@ -145,11 +145,11 @@ SpektraLab 不是滤镜，也不是 LUT。
 
 | | |
 |---|---|
-| 下载 | 【GitHub Release 链接】 |
-| 备用 | 【网盘链接，提取码】 |
+| 下载 | https://github.com/XCMY-ZR/spektralab-fnos/releases/tag/v1.3.6 |
+| 源码 | 同一 Release 里的 `spektralab-1.3.6-source.tar.xz` |
 | 文件 | `spektralab.fpk` |
-| 大小 | 17,011,583 字节 |
-| SHA-256 | `17f27d7976d894e932e7f61ef33d6571c7ad4945b562d42e9454e8c9bebf4367` |
+| 大小 | 17,012,265 字节 |
+| SHA-256 | `ce2c5f4fdbd998284d81fcc45abb6ce44b865fa8fd9590d17d15162476a2be49` |
 | 项目地址 | https://github.com/XCMY-ZR/spektralab-fnos |
 
 ---
