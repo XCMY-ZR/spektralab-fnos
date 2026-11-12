@@ -1,0 +1,5 @@
+#!/bin/bash
+# config_init — runs before a settings change is applied. Nothing to prepare;
+# the new authorised paths only exist as environment variables after the
+# change, so the restart belongs in config_callback.
+exit 0

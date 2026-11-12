@@ -1,0 +1,19 @@
+#!/bin/bash
+# install_callback — runs after the package is laid down.
+#
+# The engine needs to read its baked resources and write the gateway socket in
+# the target directory. fnOS creates the package user before this runs; make
+# the two directories it owns explicit rather than relying on the umask of
+# whatever unpacked the archive.
+
+set -u
+
+mkdir -p "${TRIM_PKGVAR}" "${TRIM_PKGHOME}" 2>/dev/null
+
+if [ -d "${TRIM_APPDEST}" ]; then
+    chmod 755 "${TRIM_APPDEST}" 2>/dev/null
+    chmod 755 "${TRIM_APPDEST}/host" "${TRIM_APPDEST}/server" 2>/dev/null
+    chmod 755 "${TRIM_APPDEST}/host/spektralab-host" 2>/dev/null
+fi
+
+exit 0

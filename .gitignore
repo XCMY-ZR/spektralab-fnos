@@ -1,0 +1,11 @@
+# Build outputs
+/spektralab.fpk
+
+# Assembled by build.sh from the SpektraLab checkout: the engine binary, its
+# baked data and the built interface are build outputs, not sources.
+/fnos/app/host/
+/fnos/app/server/web/
+
+# Editor and OS noise
+.DS_Store
+*.swp

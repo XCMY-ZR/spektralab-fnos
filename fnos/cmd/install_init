@@ -1,0 +1,5 @@
+#!/bin/bash
+# install_init — runs before the package is laid down. Nothing to prepare:
+# the engine resources are baked into the package and the Node runtime is a
+# declared dependency (nodejs_v22).
+exit 0

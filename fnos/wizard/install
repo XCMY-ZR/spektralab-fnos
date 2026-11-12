@@ -1,0 +1,11 @@
+[
+  {
+    "stepTitle": "SpektraLab",
+    "items": [
+      {
+        "type": "tips",
+        "helpText": "SpektraLab 将以独立应用用户运行，内置 Vulkan 渲染引擎（无可用 GPU 时回退到 CPU）。安装后可在应用设置中授权照片目录；导出文件默认写入共享目录 spektralab/exports。"
+      }
+    ]
+  }
+]

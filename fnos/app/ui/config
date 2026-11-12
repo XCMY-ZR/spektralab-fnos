@@ -1,0 +1,14 @@
+{
+  ".url": {
+    "spektralab.main": {
+      "title": "SpektraLab",
+      "icon": "images/icon_{0}.png",
+      "type": "iframe",
+      "protocol": "",
+      "gatewayPrefix": "/app/spektralab",
+      "gatewaySocket": "app.sock",
+      "url": "/app/spektralab",
+      "allUsers": true
+    }
+  }
+}

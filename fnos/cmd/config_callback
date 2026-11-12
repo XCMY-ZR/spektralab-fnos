@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# config_callback — runs after the user changes the app's settings, which is
+# where an authorised folder is added or removed. The file browser reads
+# TRIM_DATA_ACCESSIBLE_PATHS once at process start, so a running service must be
+# restarted to see the new roots. A stopped service is left stopped.
+
+set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+if "${DIR}/main" status; then
+    "${DIR}/main" stop
+    "${DIR}/main" start
+fi
+exit 0

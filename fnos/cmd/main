@@ -1,0 +1,155 @@
+#!/bin/bash
+#
+# cmd/main — start, stop and report the fnOS side of SpektraLab.
+#
+# One Node process (app/server/server.mjs) serves the interface, owns the file
+# browser, and spawns `host/spektralab-host`, which is the C++ Vulkan render
+# engine. The unified gateway reaches the process through ${TRIM_APPDEST}/app.sock,
+# declared as `gatewaySocket` in app/ui/config.
+#
+# The engine binary and its baked resources live in ${TRIM_APPDEST}/host/. They
+# are data, not code: nothing is compiled at install or start time.
+
+set -u
+
+export PATH=/var/apps/nodejs_v22/target/bin:$PATH
+
+APP_DIR="${TRIM_APPDEST}/server"
+SOCKET="${TRIM_APPDEST}/app.sock"
+LOG_FILE="${TRIM_PKGVAR}/spektralab.log"
+PID_FILE="${TRIM_PKGVAR}/spektralab.pid"
+
+mkdir -p "${TRIM_PKGVAR}" 2>/dev/null
+
+# Mesa (iris/anv) caches compiled pipelines under $XDG_CACHE_HOME, falling back
+# to $HOME/.cache. fnOS does not create the package user's passwd home
+# (/home/spektralab), so without this the driver logs
+# "Failed to create /home/spektralab for shader cache" and recompiles every
+# pipeline on every start. TRIM_PKGHOME is the package's own writable home.
+export HOME="${TRIM_PKGHOME:-${HOME}}"
+export XDG_CACHE_HOME="${TRIM_PKGVAR}/cache"
+mkdir -p "${XDG_CACHE_HOME}" "${HOME}" 2>/dev/null
+
+log_msg() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "${LOG_FILE}"
+}
+
+# The install/start dialogs read this file; never write to an empty path.
+fail_msg() {
+    [ -n "${TRIM_TEMP_LOGFILE:-}" ] && echo "$*" > "${TRIM_TEMP_LOGFILE}"
+    log_msg "$*"
+}
+
+check_process() {
+    kill -0 "$1" 2>/dev/null
+}
+
+# The engine is node's child, so a clean SIGTERM reaches it through node's own
+# shutdown. If node was SIGKILLed, crashed, or was replaced during an upgrade,
+# the engine can outlive it and hold the decoded frame — stop it by name too.
+# The path is per-install, so this cannot reach another app's process.
+kill_engine() {
+    [ -n "${TRIM_APPDEST:-}" ] || return 0
+    local p
+    for p in $(pgrep -f "${TRIM_APPDEST}/host/spektralab-host" 2>/dev/null); do
+        kill -TERM "$p" 2>/dev/null
+    done
+    sleep 0.5
+    for p in $(pgrep -f "${TRIM_APPDEST}/host/spektralab-host" 2>/dev/null); do
+        kill -KILL "$p" 2>/dev/null
+    done
+}
+
+status_app() {
+    if [ -f "${PID_FILE}" ]; then
+        local pid
+        pid="$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')"
+        if [ -n "${pid}" ] && check_process "${pid}"; then
+            return 0
+        fi
+        rm -f "${PID_FILE}"
+    fi
+    return 1
+}
+
+start_app() {
+    if status_app; then
+        return 0
+    fi
+
+    if [ ! -f "${APP_DIR}/server.mjs" ]; then
+        fail_msg "缺少服务文件：${APP_DIR}/server.mjs，请重新安装应用。"
+        return 1
+    fi
+    if [ ! -x "${TRIM_APPDEST}/host/spektralab-host" ]; then
+        fail_msg "缺少渲染引擎：${TRIM_APPDEST}/host/spektralab-host，请重新安装应用。"
+        return 1
+    fi
+
+    log_msg "starting SpektraLab ${TRIM_APPVER:-}"
+    rm -f "${SOCKET}"
+    # Nothing of this install is running (status_app said so); any engine still
+    # alive is an orphan from a crash or an upgrade and would compete for GPU.
+    kill_engine
+    cd "${APP_DIR}" || return 1
+    node server.mjs >> "${LOG_FILE}" 2>&1 &
+    echo "$!" > "${PID_FILE}"
+
+    # Wait for the Unix socket so the first desktop click does not race startup.
+    local n=0
+    while [ ! -S "${SOCKET}" ] && [ "${n}" -lt 50 ]; do
+        if ! status_app; then
+            fail_msg "SpektraLab 服务启动失败，日志：${LOG_FILE}"
+            return 1
+        fi
+        sleep 0.2
+        n=$((n + 1))
+    done
+    if [ ! -S "${SOCKET}" ]; then
+        fail_msg "SpektraLab 服务未能在 10 秒内创建 ${SOCKET}，日志：${LOG_FILE}"
+        return 1
+    fi
+    return 0
+}
+
+stop_app() {
+    log_msg "stopping SpektraLab"
+    if [ -f "${PID_FILE}" ]; then
+        local pid
+        pid="$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')"
+        if [ -n "${pid}" ] && check_process "${pid}"; then
+            kill -TERM "${pid}" 2>/dev/null
+            local n=0
+            while check_process "${pid}" && [ "${n}" -lt 10 ]; do
+                sleep 0.5
+                n=$((n + 1))
+            done
+            if check_process "${pid}"; then
+                kill -KILL "${pid}" 2>/dev/null
+            fi
+        fi
+        rm -f "${PID_FILE}"
+    fi
+    kill_engine
+    rm -f "${SOCKET}"
+    return 0
+}
+
+case "${1:-}" in
+    start)
+        start_app
+        ;;
+    stop)
+        stop_app
+        ;;
+    status)
+        if status_app; then
+            exit 0
+        fi
+        exit 3
+        ;;
+    *)
+        fail_msg "Unknown command: ${1:-}"
+        exit 1
+        ;;
+esac

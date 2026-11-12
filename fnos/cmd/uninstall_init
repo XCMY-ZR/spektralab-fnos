@@ -1,0 +1,7 @@
+#!/bin/bash
+# uninstall_init — stop the service and its engine child before the package
+# directory is removed.
+set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"
+"${DIR}/main" stop >/dev/null 2>&1
+exit 0

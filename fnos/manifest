@@ -1,0 +1,23 @@
+appname               = spektralab
+version               = 1.3.6
+display_name          = SpektraLab
+desc                  = 光谱法胶片与相纸模拟：打开 RAW，选择底片和相纸，约一秒得到一张物理建模的照片。支持 RAW/TIFF/JPEG，导出 TIFF 与 3D LUT。<br>Film and print simulation by spectral modelling: open a RAW, pick a film and a paper, and get a physically modelled print.
+source                = thirdparty
+platform              = x86
+
+maintainer            = SpektraLab contributors
+maintainer_url        = https://github.com/JamesQiu2005/SpektraLab
+distributor           = SpektraLab contributors
+distributor_url       = https://spektralab.app
+
+os_min_version        = 1.1.3100
+
+desktop_uidir         = ui
+desktop_applaunchname = spektralab.main
+
+install_dep_apps      = nodejs_v22
+ctl_stop              = true
+checkport             = false
+disable_authorization_path = false
+
+changelog             = 1.3.6：黑白胶片改用 Multigrade 2 号滤色印相——此前的黑白印相偏亮约 0.36 密度、反差约 3½ 号，现在与彩色一样按相纸自身的滤色包印相；1.3.5：输出色彩变换改由显卡完成——全尺寸渲染与导出不再有 5 秒多的 CPU 转换，1:1 预览显示更快；1.3.4：编辑响应更快——适应窗口时不再渲染全尺寸（只在放大超过预览分辨率或导出时渲染），拖动滑块时先用低分辨率草稿、松手后补清晰图；1.3.3：关闭页面后释放渲染会话（前端在 pagehide 时通知引擎，服务端在无界面连接 90 秒后重启空闲引擎），停止应用时同时清理残留的渲染进程；1.3.2：修复着色器缓存被禁用的问题（fnOS 不创建包用户的 /home 目录，Mesa 因此每次启动重新编译管线）；1.3.1：首个飞牛 fnOS 版本，统一网关入口 /app/spektralab，内置 Vulkan 渲染引擎（Intel/AMD 核显或独显，无可用 Vulkan 设备时回退 CPU lavapipe），支持 RAW/TIFF/JPEG 打开、胶片与相纸模拟、导出 TIFF 与 3D LUT。

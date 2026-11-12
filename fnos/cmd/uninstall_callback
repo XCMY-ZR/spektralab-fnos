@@ -1,0 +1,6 @@
+#!/bin/bash
+# uninstall_callback — the package directory is gone. Only the gateway socket
+# could be left behind if the process was killed hard.
+set -u
+[ -n "${TRIM_APPDEST:-}" ] && rm -f "${TRIM_APPDEST}/app.sock" 2>/dev/null
+exit 0

@@ -1,0 +1,10 @@
+#!/bin/bash
+# upgrade_callback — the target directory has been replaced. Restore the modes
+# the engine binary needs; data in TRIM_PKGVAR is left untouched.
+set -u
+if [ -d "${TRIM_APPDEST}" ]; then
+    chmod 755 "${TRIM_APPDEST}" 2>/dev/null
+    chmod 755 "${TRIM_APPDEST}/host" "${TRIM_APPDEST}/server" 2>/dev/null
+    chmod 755 "${TRIM_APPDEST}/host/spektralab-host" 2>/dev/null
+fi
+exit 0
